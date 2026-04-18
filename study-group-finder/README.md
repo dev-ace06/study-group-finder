@@ -11,6 +11,7 @@ A beginner-friendly full-stack Flask web app to help students discover and join 
 - Join and leave groups
 - Simple matching suggestions on dashboard
 - Dashboard with joined groups and upcoming sessions
+- Premium upgrade via Stripe Checkout (activated only after verified payment)
 - SQLite database for local development
 
 ## Tech Stack
@@ -106,6 +107,12 @@ Use these settings for the web service:
 	- `FLASK_CONFIG=production`
 	- `SECRET_KEY=<your-random-secret>`
 	- `DATABASE_URL=<your-render-postgres-connection-string>`
+	- `STRIPE_SECRET_KEY=<your-stripe-secret-key>`
+	- `STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>`
+	- `STRIPE_PRICE_MONTHLY_ID=<your-stripe-monthly-price-id>`
+	- `STRIPE_PRICE_YEARLY_ID=<your-stripe-yearly-price-id>`
+	- `PREMIUM_MONTHLY_PRICE=$9.99` (display label)
+	- `PREMIUM_YEARLY_PRICE=$89.99` (display label)
 
 ### After First Deploy
 

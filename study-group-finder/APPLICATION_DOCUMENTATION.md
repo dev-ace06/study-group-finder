@@ -11,7 +11,7 @@ Study Group Finder is a Flask web application that helps students:
 - manage group members and roles (admin, moderator, member)
 - use premium-only features (group chat, analytics, advanced creator filter, private groups)
 - view a dashboard with joined groups, recommendations, usage, and upcoming sessions
-- view and upgrade subscription plans (mock premium activation)
+- view plans and upgrade via Stripe checkout with payment verification
 
 The app is server-rendered with Jinja templates and uses SQLAlchemy models with SQLite locally (and PostgreSQL-compatible configuration for deployment).
 
@@ -120,6 +120,13 @@ Defined in `config.py`:
   - `SECRET_KEY` from env or fallback
   - `SQLALCHEMY_DATABASE_URI` from `DATABASE_URL` or local SQLite path
   - `SQLALCHEMY_TRACK_MODIFICATIONS = False`
+  - Stripe/billing settings:
+    - `STRIPE_SECRET_KEY`
+    - `STRIPE_PUBLISHABLE_KEY`
+    - `STRIPE_PRICE_MONTHLY_ID`
+    - `STRIPE_PRICE_YEARLY_ID`
+    - `PREMIUM_MONTHLY_PRICE`
+    - `PREMIUM_YEARLY_PRICE`
 - `DevelopmentConfig`:
   - `DEBUG = True`
 - `ProductionConfig`:
@@ -343,7 +350,9 @@ Responsibilities:
 - resolve active subscription
 - evaluate premium access
 - usage snapshot generation
-- mock upgrade flow (`monthly` = 30 days, `yearly` = 365 days)
+- Stripe checkout session creation for monthly/yearly plans
+- payment verification from Stripe checkout session
+- premium activation only after verified paid checkout
 
 ### 8.3 Chat service (`services/chat_service.py`)
 
@@ -481,10 +490,22 @@ Blueprint prefix: `/subscription`
 - `GET /subscription/plans`
   - requires auth
   - shows plan cards, usage, active subscription
+  - shows configured monthly/yearly display pricing
 
 - `POST /subscription/upgrade`
   - requires auth
-  - activates mock premium subscription (`cycle=monthly|yearly`)
+  - creates Stripe Checkout session (`cycle=monthly|yearly`)
+  - redirects user to Stripe hosted checkout page
+
+- `GET /subscription/checkout/success`
+  - requires auth
+  - verifies checkout session belongs to current user
+  - verifies Stripe payment status is `paid`
+  - activates premium subscription
+
+- `GET /subscription/checkout/cancel`
+  - requires auth
+  - handles canceled checkout and returns to plans page
 
 ## 11. Frontend Templates
 
@@ -625,7 +646,7 @@ These scripts are pragmatic repair utilities, but migration commands are the pre
 - Browse listing shows public groups only.
 - Group creator ownership must be transferred before leaving a self-created group.
 - Recommendation engine is deterministic weighted heuristics, not ML.
-- Mock subscription upgrade is local app logic (not Stripe checkout).
+- Premium is activated only after Stripe-verified paid checkout.
 
 ## 18. Suggested Enhancements
 
@@ -633,7 +654,7 @@ These scripts are pragmatic repair utilities, but migration commands are the pre
 - Add CSRF protection for forms if not already enabled by extension stack.
 - Add pagination and sort controls for large browse sets.
 - Add session creation/edit routes and UI for real scheduling workflows.
-- Add real payment provider integration for premium plans.
+- Add Stripe webhooks to sync renewals, cancellations, and failed payments.
 - Add API mode (JSON endpoints) for mobile/client consumption.
 
 ## 19. Quick Troubleshooting
