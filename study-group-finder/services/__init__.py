@@ -14,13 +14,16 @@ from services.group_service import (
 )
 from services.chat_service import ChatServiceError, get_group_messages, post_message
 from services.subscription_service import (
-    activate_mock_premium_upgrade,
+    SubscriptionServiceError,
     can_create_group,
     can_join_group,
+    create_premium_checkout_session,
     get_active_subscription,
     get_plan_badge_label,
+    get_pricing_view_model,
     get_usage_snapshot,
     is_premium,
+    verify_payment_and_activate_premium,
 )
 
 __all__ = [
@@ -39,11 +42,14 @@ __all__ = [
     "set_group_member_role",
     "get_group_messages",
     "post_message",
-    "activate_mock_premium_upgrade",
+    "SubscriptionServiceError",
     "can_create_group",
     "can_join_group",
+    "create_premium_checkout_session",
     "get_active_subscription",
     "get_plan_badge_label",
+    "get_pricing_view_model",
     "get_usage_snapshot",
     "is_premium",
+    "verify_payment_and_activate_premium",
 ]
